@@ -1,0 +1,11 @@
+model_name: ssdlite320_mobilenet_v3_large
+input_size: [320, 320]
+layers_to_hook:
+  - features.0
+  - features.1
+  - features.2
+  - features.4
+  - features.7
+  - features.14
+baseline_fps: null
+baseline_map: null
