@@ -37,19 +37,29 @@ def run_pipeline(model_name, method="shap", threshold=0.2):
     baseline["method"] = "baseline"
     save_log(baseline, model_name + "_baseline", processed=True)
 
+    # === SHAP Pruning ===
     if method == "shap":
         print("\n🔍 Running SHAP-based pruning...")
         shap_scores = compute_shap_scores(model, dataloader, config, device=device)
-        model, pruned_layers = prune_model_by_shap(model, shap_scores, threshold=threshold)
-        after = evaluate_model(model, dataloader, device)
-        after.update({
+        model_pruned, pruned_layers = prune_model_by_shap(model, shap_scores, threshold=threshold)
+
+        after_eval = evaluate_model(model_pruned, dataloader, device)
+
+        after = {
             "method": "shap",
+            "model": model_name,
+            "map_after": after_eval["map"],
+            "fps_after": after_eval["fps"],
+            "params_after": after_eval["params"],
+            "flops_after": after_eval["flops"],
             "layers_removed": len(pruned_layers),
             "pruned_layers": pruned_layers
-        })
+        }
+
         save_log(after, model_name + "_shap", processed=True)
         plot_shap_scores(shap_scores, model_name)
         plot_map_vs_fps(baseline, after, model_name)
+
 
     elif method == "l1":
         print("\n📉 Running L1-norm pruning...")
@@ -66,12 +76,17 @@ def run_pipeline(model_name, method="shap", threshold=0.2):
     elif method == "random":
         print("\n🎲 Running random pruning...")
         model, pruned_layers = random_prune(model, config, fraction=threshold)
-        after = evaluate_model(model, dataloader, device)
-        after.update({
-            "method": "random",
+        after_eval = evaluate_model(model, dataloader, device)
+        after = {
+            "method": "shap",
+            "map_after": after_eval["map"],
+             "fps_after": after_eval["fps"],
+            "params_after": after_eval["params"],
+            "flops_after": after_eval["flops"],
             "layers_removed": len(pruned_layers),
             "pruned_layers": pruned_layers
-        })
+        }
+
         save_log(after, model_name + "_random", processed=True)
         plot_map_vs_fps(baseline, after, model_name)
 

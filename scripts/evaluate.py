@@ -20,17 +20,23 @@ def benchmark_fps(model, dataloader, device="cuda", num_batches=20):
     model.eval()
     total_time = 0.0
 
+    from torchvision.transforms.functional import normalize
+
     with torch.no_grad():
         for i, (img, _) in enumerate(dataloader):
             if i >= num_batches:
                 break
-            img = img.to(device)
+
+            image = img[0].to(device)
+            image = normalize(image, mean=[0.485, 0.456, 0.406],
+                                      std=[0.229, 0.224, 0.225])
+
             start = time.time()
-            _ = model([img[0]])
-            end = time.time()
-            total_time += (end - start)
+            _ = model([image])
+            total_time += (time.time() - start)
 
     return round(num_batches / total_time, 2)
+
 
 
 def compute_flops(model, input_size=(3, 320, 320)):
