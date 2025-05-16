@@ -1,0 +1,13 @@
+model_name: resnet50_frcnn
+input_size: [800, 800]
+
+layers_to_hook:
+  - body.layer1
+  - body.layer2
+  - body.layer3
+  - body.layer4
+  - fpn.inner_blocks.0
+  - fpn.inner_blocks.1
+  - fpn.inner_blocks.2
+
+notes: "For fasterrcnn_resnet50_fpn from torchvision"
