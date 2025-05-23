@@ -1,0 +1,26 @@
+dataset:
+  name: voc
+  root: ../../data/VOCdevkit
+  split: val    # will look in VOC2007/ImageSets/Main/val.txt
+
+model:
+  type: mobilenet_ssd
+  checkpoint: ../../models/mobilenet_ssd.pth
+
+prune:
+  threshold: 1e-3
+  ratio: 0.2
+
+finetune:
+  epochs: 3
+  lr: 1e-4
+
+logging:
+  log_dir: logs
+  plots_dir: plots
+  results_dir: results
+
+device: cuda
+shap:
+  background_size: 100
+  batch_size: 16
