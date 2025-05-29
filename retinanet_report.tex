@@ -1,0 +1,70 @@
+
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{float}
+\geometry{margin=1in}
+
+\title{\textbf{SHAP vs L1 Pruning in RetinaNet with FPN for Object Detection}}
+\author{Abhinav Shukla \\ B.Tech (Hons.), CSE (AI), CSVTU Bhilai}
+\date{May 2025}
+
+\begin{document}
+\maketitle
+
+\section*{Abstract}
+This report presents pruning results for RetinaNet with FPN using SHAP and L1-norm-based importance scores. The models were evaluated using COCO mAP@[.50:.95], FLOPs, parameter count, and inference speed (FPS). We show that SHAP pruning maintains baseline accuracy with explainability, while L1 pruning offers slight speed advantages.
+
+\section{Methodology}
+\begin{itemize}
+  \item \textbf{Model:} RetinaNet with ResNet-50 + FPN backbone (pretrained on COCO)
+  \item \textbf{Pruning:}
+    \begin{itemize}
+      \item SHAP: \( \sum |\nabla L \cdot A| \)
+      \item L1: \( \sum |W| \)
+      \item Threshold: prune bottom 5\% lowest-score conv layers
+    \end{itemize}
+  \item \textbf{Evaluation:} COCO mAP@[.50:.95], FPS, FLOPs, Params
+\end{itemize}
+
+\section{Results and Plots}
+
+\subsection*{FLOPs vs AP@[.50:.95]}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{retinanet_flops_vs_ap.png}
+  \caption{FLOPs vs AP@[.50:.95] — RetinaNet + FPN}
+\end{figure}
+
+\subsection*{FPS vs AP@[.50:.95]}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{retinanet_fps_vs_ap.png}
+  \caption{FPS vs AP@[.50:.95] — RetinaNet + FPN}
+\end{figure}
+
+\subsection*{Performance Table}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{AP@[.50:.95]} & \textbf{AP@.50} & \textbf{FPS} & \textbf{FLOPs (G)} & \textbf{Params (M)} \\
+\midrule
+Baseline       & 0.151 & 0.201 & 11.78 & 9.15 & 27.10 \\
+SHAP-Pruned    & 0.151 & 0.205 & 11.67 & 9.15 & 27.10 \\
+L1-Pruned      & 0.149 & 0.196 & 12.51 & 9.15 & 27.10 \\
+\bottomrule
+\end{tabular}
+\caption{RetinaNet + FPN: SHAP vs L1 Pruning Comparison}
+\end{table}
+
+\section{Discussion}
+SHAP pruning preserved baseline accuracy exactly (0.151 AP@[.50:.95]) while L1 saw a small drop (0.149). L1 pruning delivered higher FPS (12.51) versus SHAP (11.67), suggesting a minor trade-off between interpretability and speed. All models retained identical FLOPs and parameters due to sparse pruning. Overall, SHAP offers a transparency-optimized alternative to L1.
+
+\section*{Conclusion}
+RetinaNet pruning with SHAP demonstrates a balance between explainability and performance. L1 remains a strong baseline for inference efficiency, but SHAP’s transparency makes it valuable for deployments requiring interpretability.
+
+\end{document}
